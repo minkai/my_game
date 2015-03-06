@@ -1,0 +1,9 @@
+﻿  Advance_Tic_Tac_Toe.cpp
+c:\users\minkai\onedrive\documents\project\advance tic tac toe\advance tic tac toe\board.h(386): warning C4244: '=' : conversion from 'double' to 'int', possible loss of data
+c:\users\minkai\onedrive\documents\project\advance tic tac toe\advance tic tac toe\board.h(387): warning C4244: '=' : conversion from 'double' to 'int', possible loss of data
+c:\users\minkai\onedrive\documents\project\advance tic tac toe\advance tic tac toe\game_session.h(280): warning C4244: 'argument' : conversion from 'double' to 'int', possible loss of data
+c:\users\minkai\onedrive\documents\project\advance tic tac toe\advance tic tac toe\game_session.h(281): warning C4244: 'argument' : conversion from 'double' to 'int', possible loss of data
+c:\users\minkai\onedrive\documents\project\advance tic tac toe\advance tic tac toe\game_session.h(282): warning C4244: 'argument' : conversion from 'double' to 'int', possible loss of data
+c:\users\minkai\onedrive\documents\project\advance tic tac toe\advance tic tac toe\game_session.h(283): warning C4244: 'argument' : conversion from 'double' to 'int', possible loss of data
+c:\users\minkai\onedrive\documents\project\advance tic tac toe\advance tic tac toe\advance_tic_tac_toe.cpp(113): warning C4101: 'str' : unreferenced local variable
+  Advance Tic Tac Toe.vcxproj -> C:\Users\Minkai\OneDrive\Documents\project\Advance Tic Tac Toe\Debug\Advance Tic Tac Toe.exe
