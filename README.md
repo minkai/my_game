@@ -1,29 +1,27 @@
-# my_game
 Advance Tic Tac Toe
 
-This game uses SDL.
-https://www.libsdl.org/
+This game uses SDL. https://www.libsdl.org/
 
 To setup in Visual Studio:
 Go to Debug > Advance Tic Tac Toe Properties
-1) Configuration Properties > VC++ Directories > Include Directories
-Add SDL2_image-2.0.0\include
-Add SDL2_ttf-2.0.12\include
-Add SDL2-2.0.3\include
-Add Minkai_Library
+1) Configuration Properties > VC++ Directories > Include Directories<br>
+Add SDL2_image-2.0.0\include<br>
+Add SDL2_ttf-2.0.12\include<br>
+Add SDL2-2.0.3\include<br>
+Add Minkai_Library<br>
 
-2) Configuration Properties > VC++ Directories > Library Directories
-Add SDL2_image-2.0.0\lib\x86
-Add SDL2_ttf-2.0.12\lib\x86
-Add SDL2-2.0.3\lib\x86
+2) Configuration Properties > VC++ Directories > Library Directories<br>
+Add SDL2_image-2.0.0\lib\x86<br>
+Add SDL2_ttf-2.0.12\lib\x86<br>
+Add SDL2-2.0.3\lib\x86<br>
 
-3) Configuration Properties > Linker > Input > Additional Dependencies
-Add
-SDL2.lib
-SDL2main.lib
-SDL2_ttf.lib
-SDL2_image.lib
+3) Configuration Properties > Linker > Input > Additional Dependencies<br>
+Add<br>
+SDL2.lib<br>
+SDL2main.lib<br>
+SDL2_ttf.lib<br>
+SDL2_image.lib<br>
 
-4) Configuration Properties > Linker > System > Subsystem
-Set to Windows
+4) Configuration Properties > Linker > System > Subsystem<br>
+Set to Windows<br>
 
