@@ -1,9 +1,9 @@
 Advance Tic Tac Toe
 
-This game uses SDL. https://www.libsdl.org/
+This game uses SDL. https://www.libsdl.org/<br>
 
-To setup in Visual Studio:
-Go to Debug > Advance Tic Tac Toe Properties
+To setup in Visual Studio:<br>
+Go to Debug > Advance Tic Tac Toe Properties<br>
 1) Configuration Properties > VC++ Directories > Include Directories<br>
 Add SDL2_image-2.0.0\include<br>
 Add SDL2_ttf-2.0.12\include<br>
