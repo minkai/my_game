@@ -25,3 +25,4 @@ SDL2_image.lib<br>
 4) Configuration Properties > Linker > System > Subsystem<br>
 Set to Windows<br>
 
+If there's any questions please feel free to e-mail me at mkong2002@gmail.com
