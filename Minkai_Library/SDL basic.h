@@ -8,7 +8,7 @@
 #include "convert to str.h"
 #include "twoDVector.h"
 #include "math function.h"
-#include <vector>
+#include <set>
 #include <map>
 #include <cmath>
 #include <cstdlib>
@@ -30,6 +30,25 @@ public:
 		r = r_para;
 		g = g_para;
 		b = b_para;
+	}
+
+	bool operator==(const My_Color& obj)
+	{
+		if( r == obj.r && g == obj.g && b == obj.b )
+		{
+			return true;
+		}
+		else
+			return false;
+	}
+	bool operator!=(const My_Color& obj)
+	{
+		if( r == obj.r && g == obj.g && b == obj.b )
+		{
+			return false;
+		}
+		else
+			return true;
 	}
 };
 
@@ -60,65 +79,53 @@ private:
 		f = NULL;
 	}
 	
-	SDL_Surface* load_image(string filename)
+	SDL_Surface* set_image_surface(string image_file_location)
 	{
 		//The image that's loaded
 		SDL_Surface* loadedSurface = NULL;
 		SDL_Surface* optimizedSurface = NULL;
+		string error = "";
 
 		//Load the image
-		loadedSurface = IMG_Load(filename.c_str());
+		loadedSurface = IMG_Load(image_file_location.c_str());
 
 		//If the image loaded
 		if (loadedSurface != NULL)
 		{
-			optimizedSurface = SDL_ConvertSurface(loadedSurface, screen->format, NULL); 
-			if (optimizedSurface == NULL) 
-			{ 
-				throw "Error!";
+			optimizedSurface = SDL_ConvertSurface(loadedSurface, screen->format, NULL);
+			if (optimizedSurface != NULL)
+			{
+				//Color key surface
+				SDL_SetColorKey(optimizedSurface, SDL_TRUE, SDL_MapRGB(optimizedSurface->format, 255, 255, 255));
+			}
+			else
+			{
+				error = "Error in function set_image_surface. ";
+				error += SDL_GetError();
 			}
 			destroy_surface(loadedSurface);
-
-			//Color key surface
-			SDL_SetColorKey(optimizedSurface, SDL_TRUE, SDL_MapRGB(optimizedSurface->format, 255, 255, 255));
 		}
 		else
 		{
-			string s = "Error in function load_image. ";
-			s += SDL_GetError();
-			throw s;
+			error = "Error in function set_image_surface. ";
+			error += SDL_GetError();
+		}
+
+		if(error != "")
+		{
+			throw error;
 		}
 
 		return optimizedSurface;
 	}
-
-	SDL_Surface* set_image_surface(string image_file_location)
-	{
-		SDL_Surface* image_surface = NULL;
-		
-		image_surface = load_image(image_file_location);
-		
-		//If there was an problem loading the sprite map
-		if (image_surface == NULL)
-		{
-			throw "Error in function set_image_surface!";
-		}
-
-		return image_surface;
-	}
 	
-	void set_TTF_Font(TTF_Font* &font, string font_file_location, int font_size)
+	TTF_Font* set_TTF_Font(string font_file_location, int font_size)
 	{
 		const string ERROR_MESSAGE = "Error in function set_TTF_Font! " __FILE__ " ";
+		TTF_Font* font;
 
 		if (font_file_location != "")
 		{
-			//if font in not null
-			if (font != NULL)
-			{
-				destroy_font(font);
-			}
-
 			//Open the font
 			font = TTF_OpenFont(font_file_location.c_str(), font_size);
 
@@ -129,7 +136,11 @@ private:
 			}
 		}
 		else
+		{
 			throw ERROR_MESSAGE + " " + convert_to_str(__LINE__);
+		}
+
+		return font;
 
 	}
 
@@ -183,9 +194,6 @@ public:
 		}
 
 		SDL_StartTextInput();
-
-		//Set the window caption
-		//SDL_WM_SetCaption( str_para.c_str(), NULL );
 	}
 	
 	~My_SDL_System()
@@ -238,149 +246,246 @@ public:
 
 	void draw_horizontal_line(int x1, int x2, int y, const My_Color LINE_COLOR)
 	{
-		SDL_Rect temp = { x1, y, x2 + 1 - x1, 1 };
+		SDL_Rect temp = { x1, y, x2 - x1, 1 };
 		SDL_FillRect(screen, &temp, SDL_MapRGB(screen->format, LINE_COLOR.r, LINE_COLOR.g, LINE_COLOR.b));
 	}
 	void draw_vertical_line(int x, int y1, int y2, const My_Color LINE_COLOR)
 	{
-		SDL_Rect temp = { x, y1, 1, y2 + 1 - y1 };
+		SDL_Rect temp = { x, y1, 1, y2 - y1 };
 		SDL_FillRect(screen, &temp, SDL_MapRGB(screen->format, LINE_COLOR.r, LINE_COLOR.g, LINE_COLOR.b));
 	}
 
 	//draw a 45 degree digonal line starting from left
 	void draw_diagonal_line(int x1, int y1, int y2, const My_Color LINE_COLOR)
 	{
-		if (y1 < y2)
+		int y_move = 1;
+		if (y2 < y1)
 		{
-			for (int count = 1; count <= y2 - y1 + 1; count++)
-			{
-				SDL_Rect temp = { x1 + count - 1, y1 + count - 1, 1, 1 };
-				SDL_FillRect(screen, &temp, SDL_MapRGB(screen->format, LINE_COLOR.r, LINE_COLOR.g, LINE_COLOR.b));
-			}
+			y_move = -1;
 		}
-		else
+
+		for (int i = 0; i < abs(y2 - y1); i++)
 		{
-			for (int count = 1; count <= y1 - y2 + 1; count++)
-			{
-				SDL_Rect temp = { x1 + count - 1, y1 - count + 1, 1, 1 };
-				SDL_FillRect(screen, &temp, SDL_MapRGB(screen->format, LINE_COLOR.r, LINE_COLOR.g, LINE_COLOR.b));
-			}
+			SDL_Rect temp = { x1 + i, y1 + i*y_move, 1, 1 };
+			SDL_FillRect(screen, &temp, SDL_MapRGB(screen->format, LINE_COLOR.r, LINE_COLOR.g, LINE_COLOR.b));
 		}
 	}
+
 	void draw_line(twoDVector<int> endpoint1, twoDVector<int> endpoint2, const My_Color LINE_COLOR)
 	{
 		int dx = endpoint2.x - endpoint1.x;
 		int dy = endpoint2.y - endpoint1.y;
-		double gradient = static_cast<double>(dy) / dx;
-		int x_pixel = abs(dx) + 1;
-		int y_pixel = abs(dy) + 1;
 
-		if (dy == 0)
-		{
-			draw_horizontal_line(endpoint1.x, endpoint2.x, endpoint1.y, LINE_COLOR);
-		}
-		else if (dx == 0)
-		{
-			draw_vertical_line(endpoint1.x, endpoint1.y, endpoint2.y, LINE_COLOR);
-		}
-		else if (gradient == 1 or gradient == -1)
-		{
-			draw_diagonal_line(endpoint1.x, endpoint1.y, endpoint2.y, LINE_COLOR);
-		}
-		//if the line is from lower left to upper right and closer to vertical line
-		else if (gradient < -1)
-		{
-			vector<int> y_list(0);
-			y_list = separate(y_pixel, x_pixel);
+		//start from the top
+		int start_x = endpoint1.x;
+		int start_y = endpoint1.y;
+		int inc_x = 1;
 
-			int current_x = endpoint2.x;
-			int current_y = endpoint2.y;
+		if (dx < 0)
+		{
+			inc_x = -1;
+		}
 
-			//show the line from top right to lower left
-			for (int index = 0; index <= x_pixel - 1; index++)
+		if (dy < 0)
+		{
+			twoDVector<int> reverse_endpoint1 = endpoint2;
+			twoDVector<int> reverse_endpoint2 = endpoint1;
+
+			if (dx < 0)
 			{
-				SDL_Rect temp = { current_x, current_y, 1, y_list[index] };
-				SDL_FillRect(screen, &temp, SDL_MapRGB(screen->format, LINE_COLOR.r, LINE_COLOR.g, LINE_COLOR.b));
+				reverse_endpoint1.x += 1;
+				reverse_endpoint2.x += 1;
+			}
+			else
+			{
+				reverse_endpoint1.x -= 1;
+				reverse_endpoint2.x -= 1;
+			}
 
-				//if not the last one
-				if (index != x_pixel - 1)
+			if (dy < 0)
+			{
+				reverse_endpoint1.y += 1;
+				reverse_endpoint2.y += 1;
+			}
+			else
+			{
+				reverse_endpoint1.y -= 1;
+				reverse_endpoint2.y -= 1;
+			}
+
+			start_x = reverse_endpoint1.x;
+			start_y = reverse_endpoint1.y;
+			inc_x = -inc_x;
+		}
+
+		int ry = 0;
+		//for (int index = 0; index < y_list.size(); index++)
+		for (int rx = 0; rx < abs(dx); rx++)
+		{
+			SDL_Rect temp = { start_x + inc_x*rx, start_y + ry, 1, abs(dy) - ry };
+
+			//if this is not the last iteration
+			if (rx != abs(dx) - 1)
+			{
+				int new_ry = ((rx + 1)*abs(dy)) / abs(dx);
+				temp.h = 1;
+				if (ry < new_ry)
 				{
-					current_x--;
-					current_y += y_list[index];
+					temp.h = new_ry - ry;
+				}
+
+				ry = new_ry;
+			}
+
+			SDL_FillRect(screen, &temp, SDL_MapRGB(screen->format, LINE_COLOR.r, LINE_COLOR.g, LINE_COLOR.b));
+		}
+	}//end function draw_line
+
+	void test_draw_line(twoDVector<int> ep1, twoDVector<int> ep2, set<twoDVector<int>> line_location)
+	{
+		const My_Color LINE_COLOR(255, 255, 255);
+		My_Color actual_color;
+		My_Color expected_color;
+		
+		fill_screen(My_Color(0, 0, 0));
+		draw_line(ep1, ep2, LINE_COLOR);
+
+		update_screen();
+
+		SDL_LockSurface(screen);
+		Uint32 *pixels = (Uint32 *)screen->pixels;
+		for (int x = 0; x < screen->w; x++)
+		{
+			for (int y = 0; y < screen->h; y++)
+			{
+				SDL_GetRGB(pixels[(y * screen->w) + x], screen->format, &actual_color.r, &actual_color.g, &actual_color.b);
+				if (line_location.find(twoDVector<int>(x, y)) != line_location.end())
+				{
+					expected_color = LINE_COLOR;
+				}
+				else
+				{
+					expected_color = My_Color(0, 0, 0);
+				}
+
+				if (actual_color != expected_color)
+				{
+					throw "Error at x: " + convert_to_str(x) + ", y: " + convert_to_str(y);
 				}
 			}
 		}
-		//if the line is from upper left to lower right and closer to vertical line
-		else if (1 < gradient)
+
+		SDL_UnlockSurface(screen);
+	}
+
+	void test_draw_line()
+	{
+		for (int test_case = 1; test_case <= 7; test_case++)
 		{
-			vector<int> y_list(0);
-			y_list = separate(y_pixel, x_pixel);
+			twoDVector<int> ep1;
+			twoDVector<int> ep2;
+			set<twoDVector<int>> line_location;
 
-			int current_x = endpoint2.x;
-			int current_y = endpoint2.y + 1 - y_list[0];
-
-			//show the line from bottom right to top left
-			for (int index = 0; index <= x_pixel - 1; index++)
+			if (test_case == 1)
 			{
-				SDL_Rect temp = { current_x, current_y, 1, y_list[index] };
-				SDL_FillRect(screen, &temp, SDL_MapRGB(screen->format, LINE_COLOR.r, LINE_COLOR.g, LINE_COLOR.b));
+				ep1 = twoDVector<int>(1, 1);
+				ep2 = twoDVector<int>(5, 2);
 
-				//if not the last one
-				if (index != x_pixel - 1)
-				{
-					current_x--;
-					current_y -= y_list[index + 1];
-				}
-			}//end for
-		}
-		//if the line is from lower left to upper right and closer to horizontal line
-		else if (-1 < gradient and gradient < 0)
-		{
-			vector<int> x_list(0);
-			x_list = separate(x_pixel, y_pixel);
-
-			int current_x = endpoint2.x + 1 - x_list[0];
-			int current_y = endpoint2.y;
-
-			//show the line from top right to lower left
-			for (int index = 0; index <= y_pixel - 1; index++)
+				line_location.insert(twoDVector<int>(1, 1));
+				line_location.insert(twoDVector<int>(2, 1));
+				line_location.insert(twoDVector<int>(3, 1));
+				line_location.insert(twoDVector<int>(4, 1));
+			}
+			else if (test_case == 2)
 			{
-				SDL_Rect temp = { current_x, current_y, x_list[index], 1 };
-				SDL_FillRect(screen, &temp, SDL_MapRGB(screen->format, LINE_COLOR.r, LINE_COLOR.g, LINE_COLOR.b));
+				ep1 = twoDVector<int>(0, 0);
+				ep2 = twoDVector<int>(4, -1);
 
-				//if not the last one
-				if (index != y_pixel - 1)
-				{
-					current_x -= x_list[index + 1];
-					current_y++;
-				}
-			}//end for
-		}
-		//if the line is from upper left to lower right and closer to horizontal line
-		else
-		{
-			vector<int> x_list(0);
-			x_list = separate(x_pixel, y_pixel);
-
-			int current_x = endpoint2.x + 1 - x_list[0];
-			int current_y = endpoint2.y;
-
-			//show the line from top right to lower left
-			for (int index = 0; index <= y_pixel - 1; index++)
+				line_location.insert(twoDVector<int>(0, 0));
+				line_location.insert(twoDVector<int>(1, 0));
+				line_location.insert(twoDVector<int>(2, 0));
+				line_location.insert(twoDVector<int>(3, 0));
+			}
+			else if (test_case == 3)
 			{
-				SDL_Rect temp = { current_x, current_y, x_list[index], 1 };
-				SDL_FillRect(screen, &temp, SDL_MapRGB(screen->format, LINE_COLOR.r, LINE_COLOR.g, LINE_COLOR.b));
+				ep1 = twoDVector<int>(1, 1);
+				ep2 = twoDVector<int>(2, 7);
 
-				//if not the last one
-				if (index != y_pixel - 1)
-				{
-					current_x -= x_list[index + 1];
-					current_y--;
-				}
-			}//end for
+				line_location.insert(twoDVector<int>(1, 1));
+				line_location.insert(twoDVector<int>(1, 2));
+				line_location.insert(twoDVector<int>(1, 3));
+				line_location.insert(twoDVector<int>(1, 4));
+				line_location.insert(twoDVector<int>(1, 5));
+				line_location.insert(twoDVector<int>(1, 6));
+			}
+			else if (test_case == 4)
+			{
+				ep1 = twoDVector<int>(6, 2);
+				ep2 = twoDVector<int>(0, 8);
+
+				line_location.insert(twoDVector<int>(6, 2));
+				line_location.insert(twoDVector<int>(5, 3));
+				line_location.insert(twoDVector<int>(4, 4));
+				line_location.insert(twoDVector<int>(3, 5));
+				line_location.insert(twoDVector<int>(2, 6));
+				line_location.insert(twoDVector<int>(1, 7));
+			}
+			else if (test_case == 5)
+			{
+				ep1 = twoDVector<int>(2, 2);
+				ep2 = twoDVector<int>(10, 5);
+
+				line_location.insert(twoDVector<int>(2, 2));
+				line_location.insert(twoDVector<int>(3, 2));
+				line_location.insert(twoDVector<int>(4, 2));
+				line_location.insert(twoDVector<int>(5, 3));
+				line_location.insert(twoDVector<int>(6, 3));
+				line_location.insert(twoDVector<int>(7, 3));
+				line_location.insert(twoDVector<int>(8, 4));
+				line_location.insert(twoDVector<int>(9, 4));
+			}
+			else if (test_case == 6)
+			{
+				ep1 = twoDVector<int>(10, 10);
+				ep2 = twoDVector<int>(20, 8);
+
+				line_location.insert(twoDVector<int>(10, 10));
+				line_location.insert(twoDVector<int>(11, 10));
+				line_location.insert(twoDVector<int>(12, 10));
+				line_location.insert(twoDVector<int>(13, 10));
+				line_location.insert(twoDVector<int>(14, 10));
+				line_location.insert(twoDVector<int>(15, 9));
+				line_location.insert(twoDVector<int>(16, 9));
+				line_location.insert(twoDVector<int>(17, 9));
+				line_location.insert(twoDVector<int>(18, 9));
+				line_location.insert(twoDVector<int>(19, 9));
+			}
+			else
+			{
+				ep1 = twoDVector<int>(11, 19);
+				ep2 = twoDVector<int>(7, 4);
+
+				line_location.insert(twoDVector<int>(8, 5));
+				line_location.insert(twoDVector<int>(8, 6));
+				line_location.insert(twoDVector<int>(8, 7));
+				line_location.insert(twoDVector<int>(9, 8));
+				line_location.insert(twoDVector<int>(9, 9));
+				line_location.insert(twoDVector<int>(9, 10));
+				line_location.insert(twoDVector<int>(9, 11));
+				line_location.insert(twoDVector<int>(10, 12));
+				line_location.insert(twoDVector<int>(10, 13));
+				line_location.insert(twoDVector<int>(10, 14));
+				line_location.insert(twoDVector<int>(10, 15));
+				line_location.insert(twoDVector<int>(11, 16));
+				line_location.insert(twoDVector<int>(11, 17));
+				line_location.insert(twoDVector<int>(11, 18));
+				line_location.insert(twoDVector<int>(11, 19));
+			}
+			
+			test_draw_line(ep1, ep2, line_location);
 		}
 
-	}//end function draw_line
+	}
 	//changes the cursor to the image at file_location
 	//if file_location is empty, change back to normal cursor
 	void change_cursor(string file_location)
@@ -403,13 +508,12 @@ public:
 		rect.x = position.x;
 		rect.y = position.y;
 
-		try
+		int returned_value = SDL_BlitSurface(source, NULL, screen, &rect);
+		destroy_surface( source );
+		
+		if( returned_value < 0 )
 		{
-			SDL_BlitSurface(source, NULL, screen, &rect);
-		}
-		catch (...)
-		{
-			printf(SDL_GetError());
+			throw SDL_GetError();
 		}
 	}
 	
@@ -417,8 +521,7 @@ public:
 	{
 		string error = "";
 		SDL_Surface* text_surface;
-		TTF_Font* font = NULL;
-		set_TTF_Font(font, font_file_location, font_size);
+		TTF_Font* font = set_TTF_Font(font_file_location, font_size);
 		SDL_Rect rect;
 		rect.x = position.x;
 		rect.y = position.y;
@@ -429,16 +532,22 @@ public:
 			text_surface = TTF_RenderText_Solid(font, text.c_str(), convert_to_SDL_Color(c));
 			if (text_surface != NULL)
 			{
-				SDL_BlitSurface(text_surface, NULL, screen, &rect);			
+				int returned_value = SDL_BlitSurface(text_surface, NULL, screen, &rect);
+				if (returned_value < 0)
+				{
+					error = "Error in function apply_text!";
+					error += SDL_GetError();
+				}
 			}
 			else
 			{
-				error = "Error in function set_text_surface!";
-			}		
+				error = "Error in function apply_text!";
+				error += SDL_GetError();
+			}
 		}
 		else
 		{
-			error = "Error in function set_text_surface!";
+			error = "Error in function apply_text!";
 		}
 
 		destroy_surface(text_surface);
@@ -485,7 +594,6 @@ public:
 			SDL_BlitSurface(cursor, NULL, screen, &rect);
 		}
 
-		
 		SDL_UpdateWindowSurface(window);
 	}
 

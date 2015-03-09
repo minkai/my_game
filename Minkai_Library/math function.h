@@ -3,8 +3,8 @@
 
 #include <iostream>
 #include <cmath>
-#include <vector>
 #include <list>
+#include <vector>
 #include "twoDVector.h"
 //#include "Box.h"
 #include "SafeArray.h"
@@ -15,9 +15,9 @@ using namespace std;
 
 //double calculate_value(string str_para);
 //void calculate_value_operation(string& str_para, int& index);
-void generate_prime_number(int number_of_prime, vector<int>& vect);
-void get_next_prime_number(vector<int>& vect);
-void break_to_prime_numbers(int num, vector<int>& vect);
+//void generate_prime_number(int number_of_prime, vector<int>& vect);
+//void get_next_prime_number(vector<int>& vect);
+//void break_to_prime_numbers(int num, vector<int>& vect);
 int count_number_of_order(int p, int n);
 int count_number_of_combination(int p, int n);
 int factorial(int n);
@@ -37,7 +37,7 @@ double calculate_distance(twoDVector<T1> coordinate1, twoDVector<T2> coordinate2
 {
 	return calculate_distance(coordinate1.x, coordinate1.y, coordinate2.x, coordinate2.y);
 }
-vector<int> separate(int total_value, int number_of_list);
+SafeArray<int> separate(int total_value, int number_of_list);
 twoDVector <int> calculate_direction( int x1, int y1, int x2, int y2);
 twoDVector <int> find_top_left( const twoDVector<int> &coordinate1, const twoDVector<int> &coordinate2 );
 

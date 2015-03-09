@@ -86,6 +86,7 @@ int main(int argc, char* args[])
 	try
 	{
 		//Game_Session::test_count_line_area_with_mark(sdl_system);
+		//sdl_system.test_draw_line();
 		game_state state;
 		state = run_title_screen(sdl_system);
 		

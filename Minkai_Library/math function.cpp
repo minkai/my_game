@@ -80,6 +80,7 @@ void calculate_value_operation(string& str_para, int& index)
 
 	index = left_operand_starting_index + answer.size()-1;
 }*/
+/*
 //generate prime numbers. first parameter determines the number of prime num the function will generate. 
 //The list of prime num will be stored in vect
 //precondition: number_of_prime must be 1 or more
@@ -100,7 +101,7 @@ void generate_prime_number(int number_of_prime, vector<int>& vect)
 		get_next_prime_number(vect);
 	}
 
-}
+}*/
 //assumes that vect has prime numbers starting from the first one
 //and insert the next prime number
 //if vect is empty, 2 will be inserted
@@ -387,33 +388,41 @@ twoDVector<long double> calculate_direction( long double x1, long double y1, lon
 	return temp;
 }
 
-//returns a vector having size number_of_list and adds up to total_value
-vector<int> separate( int total_value, int number_of_list)
+//returns an array having size number_of_values and adds up to total_value
+SafeArray<int> separate( int total_value, int number_of_values )
 {
-	if(total_value <= 0 || number_of_list <= 0)
+	if(total_value <= 0 || number_of_values <= 0)
 	{
 		throw "Error!";
 	}
 
-	vector<int> list(0);
+	SafeArray<int> answer(number_of_values);
 
-	//why does floor return double?
-	int round_down_value = static_cast<int>(floor(static_cast<double>(total_value)/number_of_list));
-	int amount_left = total_value - round_down_value*number_of_list;
+	int t = total_value;
+	int g = 0;
 
-	//insert the round_down_value
-	for(int count = 1; count <= number_of_list; count++)
+	while( number_of_values <= t )
 	{
-		list.push_back( round_down_value );
+		g++;
+		t -= number_of_values;
 	}
 
-	for(int index = 0; index < amount_left; index++)
+	for(int i = 0; i < answer.size(); i++)
 	{
-		list[index]++;
+		answer[i] = g;
 	}
 
-	return list;
+	if (t != 0)
+	{
+		//will truncate because of int
+		int inc = number_of_values / t;
+		for (int i = 0; i < t; i++)
+		{
+			answer[number_of_values-1-i*inc]++;
+		}
+	}
 
+	return answer;
 }
 
 

@@ -430,7 +430,7 @@ public:
 				twoDVector<int>(position.x + get_width(), position.y + temp),
 				LINE_COLOR);
 		}
-
+		sdl_system.draw_filled_box(twoDVector<int>(position.x + get_width(), position.y + get_height()), twoDVector<int>(1, 1), LINE_COLOR);
 		//draw marks
 		for (int y = 0; y < tiles.get_rows(); y++)
 		{
