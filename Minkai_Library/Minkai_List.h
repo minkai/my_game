@@ -339,3 +339,107 @@ public:
 		}
 	}
 };
+
+//acts like the [] operator
+//precondition: 1 <= index+1 <= list_obj.size() 
+template<class T>
+T& get_element(list<T>& list_obj, unsigned int index)
+{
+	//if index is out of range
+	if( index < 0 || list_obj.size() < index+1 )
+		throw "Error!";
+
+	//create an iterator that starts at the beginning
+	list<T>::iterator iter = list_obj.begin();
+
+	//move forward by index
+	for(unsigned int count = 1; count <= index; count++)
+		iter++;
+
+	return *iter;
+}
+
+//check whether the list has duplicates
+template <class T>
+bool has_duplicates(const list<T>& list_obj)
+{
+	list<int>::const_iterator iter1;
+	list<int>::const_iterator iter2;
+
+	for(iter1 = list_obj.begin(); iter1 != list_obj.end(); iter1++)
+	{
+		//iterator used to point to next element after iter1
+		list<int>::const_iterator temp = iter1;
+		temp++;
+		for(iter2 = temp; iter2 != list_obj.end(); iter2++)
+		{
+			//if duplicates are found
+			if(*iter1 == *iter2)
+			{
+				return true;
+			}
+		}
+	}
+
+	return false;
+}
+
+//remove duplicates in the list
+template <class T>
+void remove_duplicates(list<T>& list_obj)
+{
+	for( list<T>::iterator iter = list_obj.begin(); iter != list_obj.end(); iter++)
+	{
+		list<T>::iterator iter_next = iter;
+		iter_next++;
+		//iter2 will scan the elements after iter
+		for( list<T>::iterator iter2 = iter_next; iter2 != list_obj.end(); iter2++)
+		{
+			//if the 2 elements are the same
+			if( *iter == *iter2 )
+			{
+				//remove it
+				list<T>::iterator temp = iter2;
+				iter2--;
+				list_obj.erase(temp);
+			}
+		}
+	}
+}
+
+//receives a list of int and replaces the zeros in list_obj with numbers
+//pushes the answers in list_answer
+/*
+void fill_blank(list<int>& list_obj, list<int>& numbers, list<list<int>>& list_answer)
+{
+	int num_of_zero = count(list_obj, 0);
+	
+	if( num_of_zero == 1 )
+	{
+		list<int> answer(list_obj);
+		list<int>::iterator iter = find(answer, 0);
+		*iter = numbers.front();
+		list_answer.push_back( answer );
+	}
+	else
+	{
+		list<int>::iterator numbers_iter = numbers.begin();
+		int index = 0;
+
+		while( numbers_iter != numbers.end() )
+		{
+			//create a copy
+			list<int> answer(list_obj);
+			list<int>::iterator iter = find(answer, 0);
+			*iter = *numbers_iter;
+
+			list<int> copy_numbers(numbers);
+			erase(copy_numbers, index);
+
+			fill_blank(answer, copy_numbers, list_answer);
+
+			numbers_iter++;
+			index++;
+		}
+	}
+}*/

@@ -61,9 +61,7 @@ private:
 
 	//image for the cursor, if null, use normal cursor
 	SDL_Surface* cursor = NULL;
-
-	//cache the image
-	//map<string, SDL_Surface*> image_cache;
+	twoDVector<int> cursor_position;
 
 	static void destroy_surface(SDL_Surface* &surface)
 	{
@@ -233,7 +231,56 @@ public:
 	{
 		SDL_FillRect(screen, NULL, SDL_MapRGB(screen->format, c.r, c.g, c.b));
 	}
+	void draw_pixel(twoDVector<int> position, const My_Color COLOR)
+	{
+		SDL_Rect temp_rect = { position.x, position.y, 1, 1 };
+		SDL_FillRect(screen, &temp_rect, SDL_MapRGB(screen->format, COLOR.r, COLOR.g, COLOR.b));
+	}
 
+	void draw_empty_box(int x, int y, int width, int height, const My_Color BOX_COLOR)
+	{
+		//define the rects
+		SDL_Rect left = { x, y, 1, height };
+		SDL_Rect right = { x + width - 1, y, 1, height };
+		SDL_Rect top = { x, y, width, 1 };
+		SDL_Rect bottom = { x, y + height - 1, width, 1 };
+
+		Uint32 mapped_box_color = SDL_MapRGB(screen->format, BOX_COLOR.r, BOX_COLOR.g, BOX_COLOR.b);
+
+		//draw the lines
+		SDL_FillRect(screen, &left, mapped_box_color);
+		SDL_FillRect(screen, &right, mapped_box_color);
+		SDL_FillRect(screen, &top, mapped_box_color);
+		SDL_FillRect(screen, &bottom, mapped_box_color);
+	}
+	/*
+	void draw_empty_box(const twoDVector<int>& coordinate1, const twoDVector<int>& coordinate2, const My_Color BOX_COLOR)
+	{
+		twoDVector<int> top_left_coordinate = find_top_left(coordinate1, coordinate2);
+		twoDVector<int> dimension(abs(coordinate1.x - coordinate2.x) + 1, abs(coordinate1.y - coordinate2.y) + 1);
+
+		//draw the box
+		draw_empty_box(top_left_coordinate.x, top_left_coordinate.y, dimension.x, dimension.y, BOX_COLOR);
+	}*/
+	//draw the corners of an empty box
+	void draw_partial_box(int x, int y, int width, int height, int length_of_corner, const SDL_Color BOX_COLOR)
+	{
+		SafeArray<SDL_Rect> rects(8);
+
+		/*left_up*/     rects[0] = { x, y, 1, length_of_corner };
+		/*left_down*/   rects[1] = { x, y + height - length_of_corner, 1, length_of_corner };
+		/*right_up*/    rects[2] = { x + width - 1, y, 1, length_of_corner };
+		/*right_down*/  rects[3] = { x + width - 1, y + height - length_of_corner, 1, length_of_corner };
+		/*top_left*/    rects[4] = { x, y, length_of_corner, 1 };
+		/*top_right*/   rects[5] = { x + width - length_of_corner, y, length_of_corner, 1 };
+		/*bottom_left*/ rects[6] = { x, y + height - 1, length_of_corner, 1 };
+		/*bottom_right*/rects[7] = { x + width - length_of_corner, y + height - 1, length_of_corner, 1 };
+
+		for (int index = 0; index < rects.size(); index++)
+		{
+			SDL_FillRect(screen, &(rects[index]), SDL_MapRGB(screen->format, BOX_COLOR.r, BOX_COLOR.g, BOX_COLOR.b));
+		}
+	}
 	void draw_filled_box(twoDVector<int> position, twoDVector<int> dimension, My_Color c)
 	{
 		SDL_Rect rect;
@@ -340,7 +387,20 @@ public:
 			SDL_FillRect(screen, &temp, SDL_MapRGB(screen->format, LINE_COLOR.r, LINE_COLOR.g, LINE_COLOR.b));
 		}
 	}//end function draw_line
+	void draw_circle(twoDVector<int> center, const double RADIUS, const My_Color COLOR)
+	{
+		if (RADIUS <= 0)
+		{
+			throw "Error!";
+		}
 
+		//use parametric equations, t goes from 0 to 2 pi
+		for (double t = 0; t <= 6.283185; t += 1 / RADIUS)
+		{
+			//display the pixel
+			draw_pixel(twoDVector<int>(static_cast<int>(RADIUS*cos(t) + center.x), static_cast<int>(RADIUS*sin(t) + center.y)), COLOR);
+		}
+	}
 	void test_draw_line(twoDVector<int> ep1, twoDVector<int> ep2, set<twoDVector<int>> line_location)
 	{
 		const My_Color LINE_COLOR(255, 255, 255);
@@ -488,7 +548,7 @@ public:
 	}
 	//changes the cursor to the image at file_location
 	//if file_location is empty, change back to normal cursor
-	void change_cursor(string file_location)
+	void change_cursor(string file_location, twoDVector<int> p = twoDVector<int>(0, 0))
 	{
 		if (file_location == "")
 		{		
@@ -497,6 +557,7 @@ public:
 		else
 		{			
 			cursor = set_image_surface(file_location);
+			cursor_position = p;
 		}
 	}
 
@@ -588,8 +649,8 @@ public:
 			SDL_ShowCursor(0);
 			twoDVector<int> m = get_mouse_position();
 			SDL_Rect rect;
-			rect.x = m.x;
-			rect.y = m.y;
+			rect.x = m.x + cursor_position.x;
+			rect.y = m.y + cursor_position.y;
 
 			SDL_BlitSurface(cursor, NULL, screen, &rect);
 		}
@@ -664,24 +725,5 @@ public:
 		}
 	}
 };
-/*
-extern SDL_Surface* screen;
-extern SDL_Window* window;
-extern SDL_Event event;
-*/
-//The screen attributes
-//const int SCREEN_WIDTH = 1000;
-//const int SCREEN_HEIGHT = 480;
-//const int SCREEN_BPP = 32;
 
-/*
-void apply_surface( int x, int y, SDL_Surface* source, SDL_Surface* destination, SDL_Rect* clip = NULL );
-SDL_Surface *load_image( string filename );
-void clean_up();
-void destroy_font(TTF_Font* &font);
-void set_TTF_Font( TTF_Font* &font, string file_name, int font_size);
-void destroy_surface(SDL_Surface* &surface);
-void set_text_surface(SDL_Surface* &text_surface, TTF_Font* font, const string text_str, const SDL_Color textColor);
-void set_image_surface(SDL_Surface* &image_surface, string image_file_location);
-*/
 #endif

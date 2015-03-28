@@ -23,7 +23,7 @@ protected:
 	virtual void handle_events_for_left_mouse_released(twoDVector<int> mouse_position)
 	{
 		//If the mouse is over the button
-		if (point_is_over(mouse_position.x, mouse_position.y))
+		if (point_is_over(mouse_position))
 		{
 			//if the mouse was holding the button
 			if (mouse_status == hold)
@@ -73,11 +73,9 @@ public:
 		Image_Label::show(sdl_system);
 		if (mouse_status == in or mouse_status == hold)
 		{
-			sdl_system.change_cursor("hand-pointer-icon2.bmp");
+			sdl_system.change_cursor("hand-pointer-icon2.bmp", twoDVector<int>(-6, -1));
 		}
 	}
 };
-
-
 
 #endif

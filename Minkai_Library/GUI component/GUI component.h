@@ -45,7 +45,7 @@ protected:
 	virtual void handle_events_for_mouse_moved(twoDVector<int> mouse_position)
 	{
 		//If the mouse is over the GUI component
-		if( point_is_over(mouse_position.x, mouse_position.y) )
+		if( point_is_over(mouse_position) )
 		{
 			if(mouse_status != hold)
 			{
@@ -60,7 +60,7 @@ protected:
 	virtual void handle_events_for_left_mouse_pressed(twoDVector<int> mouse_position)
 	{
 		//If the mouse is over the button
-		if( point_is_over(mouse_position.x, mouse_position.y) )
+		if( point_is_over(mouse_position) )
 		{
 			mouse_status = hold;
 		}
@@ -69,7 +69,7 @@ protected:
 	virtual void handle_events_for_left_mouse_released(twoDVector<int> mouse_position)
 	{
 		//If the mouse is over the button
-		if( point_is_over(mouse_position.x, mouse_position.y) )
+		if( point_is_over(mouse_position) )
 		{
 			mouse_status = in;
 		}
@@ -103,14 +103,6 @@ public:
 		dimension = d;
 	}
 	//*get functions*
-	int get_Xposition() const
-	{
-		return position.x;
-	}
-	int get_Yposition() const
-	{
-		return position.y;
-	}
 	unsigned int get_w() const
 	{
 		return dimension.x;
@@ -128,17 +120,11 @@ public:
 		return position.y + dimension.y - 1;
 	}
 	//test whether the coordinates is over the component
-	bool point_is_over(int point_x, int point_y) const
+	bool point_is_over(twoDVector<int> point) const
 	{
-		twoDVector<int> temp_vector = {point_x, point_y};
-		
-		//if mouse is over button
-		if( point_is_in_box(temp_vector, position, dimension.x, dimension.y) )
-		{
-			return true;
-		}
-		else
-			return false;
+		return (position.x <= point.x && point.x < position.x + dimension.x &&
+			position.y <= point.y && point.y < position.y + dimension.y);
+
 	}
 
 	void handle_events(My_SDL_System& s)

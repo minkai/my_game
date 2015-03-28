@@ -418,7 +418,7 @@ public:
 			int temp = i * TILE_SIZE;
 			//draw vertical line
 			sdl_system.draw_line(twoDVector<int>(position.x + temp, position.y),
-				twoDVector<int>(position.x + temp, position.y + get_height()),
+				twoDVector<int>(position.x + temp + 1, position.y + get_height()),
 				LINE_COLOR);
 		}
 
@@ -427,7 +427,7 @@ public:
 			int temp = i * TILE_SIZE;
 			//draw horizontal line
 			sdl_system.draw_line(twoDVector<int>(position.x, position.y + temp),
-				twoDVector<int>(position.x + get_width(), position.y + temp),
+				twoDVector<int>(position.x + get_width(), position.y + temp + 1),
 				LINE_COLOR);
 		}
 		sdl_system.draw_filled_box(twoDVector<int>(position.x + get_width(), position.y + get_height()), twoDVector<int>(1, 1), LINE_COLOR);

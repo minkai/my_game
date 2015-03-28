@@ -25,7 +25,6 @@ public:
 		master = master_para;
 	}
 
-
 	void set_master(master_type m)
 	{
 		master = m;

@@ -80,97 +80,124 @@ void calculate_value_operation(string& str_para, int& index)
 
 	index = left_operand_starting_index + answer.size()-1;
 }*/
-/*
-//generate prime numbers. first parameter determines the number of prime num the function will generate. 
-//The list of prime num will be stored in vect
+
+//generate prime numbers. number_of_prime determines the number of prime num the function will generate. 
 //precondition: number_of_prime must be 1 or more
-void generate_prime_number(int number_of_prime, vector<int>& vect)
+SafeArray<int> generate_prime_number(int number_of_prime)
 {
 	if( number_of_prime < 1 )
 		throw "Error!";
 
-	//clear the vect
-	vect.clear();
+	SafeArray<int> numbers(number_of_prime);
 
-	//store the first prime number(2)
-	vect.push_back(2);
+	//store the first prime number
+	numbers[0] = 2;
 	
-	//since the first prime number is already stored, count starts from 2
-	for(int count = 2; count <= number_of_prime; count++)
+	int insert_i = 1;
+	int num = numbers[0] + 1;
+
+	while (insert_i < number_of_prime)
 	{
-		get_next_prime_number(vect);
+		int i = 0;
+		//check if num is a prime
+		for (i = 0; i < insert_i; i++)
+		{
+			//if num is divisible by the current element
+			if (num % numbers[i] == 0)
+			{
+				break;
+			}
+		}
+
+		//if num is a prime, add num to numbers
+		if (i == insert_i)
+		{
+			numbers[insert_i] = num;
+			insert_i++;
+		}
+
+		num++;
 	}
 
-}*/
-//assumes that vect has prime numbers starting from the first one
+	return numbers;
+}
+//assumes that num_array has prime numbers starting from the first one
 //and insert the next prime number
 //if vect is empty, 2 will be inserted
-void get_next_prime_number(vector<int>& vect)
+int get_next_prime_number(SafeArray<int>& num_array)
 {
-	if(vect.empty())
+	if(num_array.size() == 0)
 	{
-		vect.push_back(2);
+		 return 2;
 	}
 	else
 	{
-		int num = vect.back()+1; 
-		bool num_is_prime;
+		int num = num_array[num_array.size()-1]+1; 
 
-		do
+		while( true )
 		{
+			int i = 0;
 			//check if num is a prime
-			for(unsigned int element = 1; element <= vect.size(); element++)
+			for (i = 0; i < num_array.size(); i++)
 			{
 				//if num is divisible by the current element
-				if( num % vect[element-1] == 0 )
+				if (num % num_array[i] == 0)
 				{
-					num_is_prime = false;
 					break;
 				}
-
-				//if reached the last element
-				if( element == vect.size() )
-					num_is_prime = true;
 			}
 
-			//if num is a prime, add num to the vector
-			if( num_is_prime )
-				vect.push_back( num );
+			//if num is a prime
+			if (i == num_array.size())
+			{
+				return num;
+			}
 
 			num++;
 
-		}while( !num_is_prime ); //if num is not a prime, loop again to check the next num
+		}
 	}
 }
-//breaks down num into prime numbers and store it in vect
+//breaks down num into prime numbers
 //precondition: 2 <= num
-void break_to_prime_numbers(int num, vector<int>& vect)
+SafeArray<int> break_to_prime_numbers(int num)
 {
 	if(num < 2)
 		throw "Error!";
 
 	//a list of prime numbers. Initialized to first prime number(2)
 	vector<int> prime(1, 2);
-	int current_prime_number;
-
-	//clear vect
-	vect.clear();
+	vector<int> answer_vect;
 
 	do
 	{
-		current_prime_number = prime.back();
+		int current_prime_number = prime.back();
 
 		//if current_prime_number is a factor of num
-		if(num%current_prime_number == 0)
+		if (num % current_prime_number == 0)
 		{
-			vect.push_back( current_prime_number );
+			answer_vect.push_back(current_prime_number);
 			num /= current_prime_number;
 		}
 		else
-			get_next_prime_number(prime);
+		{
+			SafeArray<int> num_array(prime.size());
+			for (int i = 0; i < prime.size(); i++)
+			{
+				num_array[i] = prime[i];
+			}
+			prime.push_back(get_next_prime_number(num_array));
+		}
 
-	}while(num != 1);
+	} while (num != 1);
 
+	SafeArray<int> answer(answer_vect.size());
+	for (int i = 0; i < answer_vect.size(); i++)
+	{
+		answer[i] = answer_vect[i];
+	}
+
+	return answer;
 }
 //count the number of order by randomly picking p cards out of n cards
 //precondition: p <= n, 0 <= p, 0 <= n
@@ -215,179 +242,6 @@ int factorial(int n)
 
 	return answer;
 }
-
-//receives a list of int and replaces the zeros in list_obj with numbers
-//pushes the answers in list_answer
-/*
-void fill_blank(list<int>& list_obj, list<int>& numbers, list<list<int>>& list_answer)
-{
-	int num_of_zero = count(list_obj, 0);
-	
-	if( num_of_zero == 1 )
-	{
-		list<int> answer(list_obj);
-		list<int>::iterator iter = find(answer, 0);
-		*iter = numbers.front();
-		list_answer.push_back( answer );
-	}
-	else
-	{
-		list<int>::iterator numbers_iter = numbers.begin();
-		int index = 0;
-
-		while( numbers_iter != numbers.end() )
-		{
-			//create a copy
-			list<int> answer(list_obj);
-			list<int>::iterator iter = find(answer, 0);
-			*iter = *numbers_iter;
-
-			list<int> copy_numbers(numbers);
-			erase(copy_numbers, index);
-
-			fill_blank(answer, copy_numbers, list_answer);
-
-			numbers_iter++;
-			index++;
-		}
-	}
-}*/
-
-//find the first item in the list
-//return list_obj.end() if can't find
-list<int>::iterator find(list<int>& list_obj, int item)
-{
-	list<int>::iterator iter = list_obj.begin();
-
-	while(iter != list_obj.end())
-	{
-		if( *iter == item )
-		{
-			return iter;
-		}
-		iter++;
-	}
-
-	return list_obj.end();
-}
-//remove the first item in the list_obj
-void remove_element(list<int>& list_obj, int item)
-{
-	list<int>::iterator iter = list_obj.begin();
-
-	while(iter != list_obj.end())
-	{
-		if( *iter == item )
-		{
-			list_obj.erase(iter);
-			break;
-		}
-
-		iter++;
-	}
-}
-//erase the element in list_obj at the index
-void erase(list<int>& list_obj, int index)
-{
-	list<int>::iterator iter = list_obj.begin();
-	int count = 0;
-
-	while(iter != list_obj.end())
-	{
-		if( count == index )
-		{
-			list_obj.erase(iter);
-			break;
-		}
-
-		iter++;
-		count++;
-	}
-}
-
-//calculate the distance using pytogarous theorm
-double calculate_distance( long double x1, long double y1, long double x2, long double y2)
-{
-	long double xDistance = x2 - x1;
-	long double yDistance = y2 - y1;
-	
-	return sqrt( pow(xDistance, 2) + pow(yDistance, 2) );
-}
-
-//calculate the gradient of the line passing point1 and point2
-//precondition: point1 and point2 must have different x-coordinate (else gradient will be +/-infinity)
-double calculate_gradient(const twoDVector<double> &point1, const twoDVector<double> &point2)
-{
-	if(point1.x == point2.x)
-		throw "Error!";
-
-	return (point2.y-point1.y)/(point2.x-point1.x);
-}
-
-//calculate the y-intercept of the line passing point1 and point2
-//precondition: a y-intercept must exist
-double calculate_y_intercept(const twoDVector<double> &point1, const twoDVector<double> &point2)
-{
-	//if the 2 points have the same x-coordinate, there will no y-intercept
-	if(point1.x == point2.x)
-		throw "Error!";
-
-	//c = y - mx
-	return point1.y - calculate_gradient(point1, point2)*point1.x;
-}
-//determine whether point3 is on the line (including the endpoints) passing point1 and point2
-bool point_is_on_line(const twoDVector<double> &point1, const twoDVector<double> &point2, const twoDVector<double> &point3)
-{
-	//if point3 lies on the line that is extended to infinity
-	if( (point2.x-point1.x)*(point3.y-point1.y) == (point2.y-point1.y)*(point3.x - point1.x) )
-	{
-		double larger_x, smaller_x, larger_y, smaller_y;
-
-		if(point1.x < point2.x)
-		{
-			larger_x = point2.x;
-			smaller_x = point1.x;
-		}
-		else
-		{
-			larger_x = point1.x;
-			smaller_x = point2.x;
-		}
-		
-		if(point1.y < point2.y)
-		{
-			larger_y = point2.y;
-			smaller_y = point1.y;
-		}
-		else
-		{
-			larger_y = point1.y;
-			smaller_y = point2.y;
-		}
-
-		//if point3 is between point1 and point2
-		if( smaller_x <= point3.x && point3.x <= larger_x && 
-			smaller_y <= point3.y && point3.y <= larger_y)
-		{
-			return true;
-		}
-		else
-			return false;
-	}
-	else
-		return false;
-}
-
-
-twoDVector<long double> calculate_direction( long double x1, long double y1, long double x2, long double y2)
-{
-	long double xDistance = x2 - x1;
-	long double yDistance = y2 - y1;
-	twoDVector<long double> temp = {xDistance, yDistance};
-
-	return temp;
-}
-
 //returns an array having size number_of_values and adds up to total_value
 SafeArray<int> separate( int total_value, int number_of_values )
 {
@@ -425,13 +279,89 @@ SafeArray<int> separate( int total_value, int number_of_values )
 	return answer;
 }
 
-
-
-// **functions related to box**
-//find the top left coordinate of a box in which coordinate1 and coordinate2 are opposite edges of the box
-twoDVector <int> find_top_left( const twoDVector<int> &coordinate1, const twoDVector<int> &coordinate2 )
+//calculate the distance using pytogarous theorm
+double calculate_distance(const twoDVector<double>& point1, const twoDVector<double>& point2)
 {
-	twoDVector<int> top_left_coordinate;
+	double xDistance = point2.x - point1.x;
+	double yDistance = point2.y - point1.y;
+	
+	return sqrt( pow(xDistance, 2) + pow(yDistance, 2) );
+}
+
+//calculate the gradient of the line passing point1 and point2
+//precondition: point1 and point2 must have different x-coordinate (else gradient will be +/-infinity)
+double calculate_gradient(const twoDVector<double>& point1, const twoDVector<double>& point2)
+{
+	if(point1.x == point2.x)
+		throw "Error!";
+
+	return (point2.y-point1.y)/(point2.x-point1.x);
+}
+
+//calculate the y-intercept of the line passing point1 and point2
+//precondition: a y-intercept must exist
+double calculate_y_intercept(const twoDVector<double>& point1, const twoDVector<double>& point2)
+{
+	//if the 2 points have the same x-coordinate, there will no y-intercept
+	if(point1.x == point2.x)
+		throw "Error!";
+
+	//c = y - mx
+	return point1.y - calculate_gradient(point1, point2)*point1.x;
+}
+
+twoDVector<double> calculate_direction(const twoDVector<double>& point1, const twoDVector<double>& point2)
+{
+	long double xDistance = point2.x - point1.x;
+	long double yDistance = point2.y - point1.y;
+	return twoDVector<double>(xDistance, yDistance);
+}
+
+//determine whether point3 is on the line (including the endpoints) passing point1 and point2
+bool point_is_on_line(const twoDVector<double>& point1, const twoDVector<double>& point2, const twoDVector<double>& point3)
+{
+	//if point3 lies on the line that is extended to infinity (assume the line has infinite length on both sides)
+	if( (point2.x-point1.x)*(point3.y-point1.y) == (point2.y-point1.y)*(point3.x - point1.x) )
+	{
+		double larger_x, smaller_x, larger_y, smaller_y;
+
+		if(point1.x < point2.x)
+		{
+			larger_x = point2.x;
+			smaller_x = point1.x;
+		}
+		else
+		{
+			larger_x = point1.x;
+			smaller_x = point2.x;
+		}
+		
+		if(point1.y < point2.y)
+		{
+			larger_y = point2.y;
+			smaller_y = point1.y;
+		}
+		else
+		{
+			larger_y = point1.y;
+			smaller_y = point2.y;
+		}
+
+		//if point3 is between point1 and point2
+		if( smaller_x <= point3.x && point3.x <= larger_x && 
+			smaller_y <= point3.y && point3.y <= larger_y)
+		{
+			return true;
+		}
+	}
+	
+	return false;
+}
+
+//find the top left coordinate of a box in which coordinate1 and coordinate2 are opposite edges of the box
+twoDVector<double> find_top_left( const twoDVector<double>& coordinate1, const twoDVector<double>& coordinate2 )
+{
+	twoDVector<double> top_left_coordinate;
 
 	//find the top left coordinate
 	if( coordinate1.x < coordinate2.x )
@@ -439,8 +369,7 @@ twoDVector <int> find_top_left( const twoDVector<int> &coordinate1, const twoDVe
 		//if 1 is above 2
 		if( coordinate1.y < coordinate2.y ) //1 is at top left, 2 is at lower right
 		{
-			top_left_coordinate.x = coordinate1.x;
-			top_left_coordinate.y = coordinate1.y;
+			top_left_coordinate = coordinate1;
 		}
 		else //1 is at lower left, 2 is at upper right
 		{
@@ -457,26 +386,28 @@ twoDVector <int> find_top_left( const twoDVector<int> &coordinate1, const twoDVe
 		}
 		else
 		{
-			top_left_coordinate.x = coordinate2.x;
-			top_left_coordinate.y = coordinate2.y;
+			top_left_coordinate = coordinate2;
 		}
 	}
 
 	return top_left_coordinate;
 }//end function find_top_left
 
-
-
-
-//coordinate1 and coordinate2 are the opposite edges of a box
-void calculate_width_height(const twoDVector<int> &coordinate1, const twoDVector<int> &coordinate2, int &width, int &height)
+bool point_is_in_box(const twoDVector<double>& point, const twoDVector<double>& box_top_left_coordinate, const twoDVector<double>& box_dimension)
 {
-	width = abs(coordinate1.x - coordinate2.x) + 1;
-	height = abs(coordinate1.y - coordinate2.y) + 1;
+	//coordinate of left and right side of the box
+	double box_left = box_top_left_coordinate.x;
+	double box_right = box_top_left_coordinate.x + box_dimension.x;
+	//coordinate of up and down side of the box
+	double box_up = box_top_left_coordinate.y;
+	double box_down = box_top_left_coordinate.y + box_dimension.y;
+
+	return ( box_left <= point.x && point.x <= box_right && 
+		box_up <= point.y && point.y <= box_down );
 }
 
 //checks whether 2 lines collide
-bool check_collision(const twoDVector<double> &line1_point1, const twoDVector<double> &line1_point2, const twoDVector<double> &line2_point1, const twoDVector<double> &line2_point2)
+bool check_collision(const twoDVector<double>& line1_point1, const twoDVector<double>& line1_point2, const twoDVector<double>& line2_point1, const twoDVector<double>& line2_point2)
 {
 	double x_a = line1_point2.x - line1_point1.x;
 	double y_a = line1_point2.y - line1_point1.y;
@@ -486,36 +417,20 @@ bool check_collision(const twoDVector<double> &line1_point1, const twoDVector<do
 	//if the 2 lines are parallel, 
 	if( y_a*x_b == y_b*x_a )
 	{
-		//if one line lies on the other
-		if( point_is_on_line(line1_point1, line1_point2, line2_point1) ||
+		//only need to check for 3 points
+		return( point_is_on_line(line1_point1, line1_point2, line2_point1) ||
 			point_is_on_line(line1_point1, line1_point2, line2_point2) ||
-			point_is_on_line(line2_point1, line2_point2, line1_point1) ||
-			point_is_on_line(line2_point1, line2_point2, line1_point2) )
-			return true;
-		else
-			return false;
+			point_is_on_line(line2_point1, line2_point2, line1_point1) );
 	}
-	/*
-	//calculate the gradient and the y-intercepts of the lines
-	double m1 = calculate_gradient(line1_point1, line1_point2);
-	double m1 = calculate_gradient(line2_point1, line2_point2);
-	double c1 = calculate_y_intercept(line1_point1, line1_point2);
-	double c2 = calculate_y_intercept(line2_point1, line2_point2);
-	*/
 	
 	//first, calculate the point of intersection
 	twoDVector<double> intersection_point;
 	intersection_point.x = (x_a * x_b * (line2_point1.y-line1_point1.y) - x_a*y_b*line2_point1.x + x_b*y_a*line1_point1.x)/
-		(x_b*y_a - x_a*y_b)/*(c2 - c1)/(m1 - m2)*/;
+		(x_b*y_a - x_a*y_b);
 	intersection_point.y = (y_a * y_b * (line2_point1.x-line1_point1.x) - x_b*y_a*line2_point1.y + x_a*y_b*line1_point1.y)/
-		(x_a*y_b - x_b*y_a)/*m1*intersection_point.x + c1*/;
+		(x_a*y_b - x_b*y_a);
 
-	//if point of intersection lies on both lines
-	if( point_is_on_line(line1_point1, line1_point2, intersection_point) &&
-		point_is_on_line(line2_point1, line2_point2, intersection_point) )
-	{
-		return true;
-	}
-	else
-		return false;
+	//if point of intersection lies on both lines, they collide
+	return( point_is_on_line(line1_point1, line1_point2, intersection_point) &&
+		point_is_on_line(line2_point1, line2_point2, intersection_point) );
 }
